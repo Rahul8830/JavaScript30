@@ -16,6 +16,49 @@
   </form>
 <script>
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+let dataArr = [];
+fetch(endpoint)
+.then(blob =>{
+  return blob.json();
+  })
+.then(data =>{
+  dataArr = data;
+  console.log("done");
+})
+
+function numberWithCommas(x) {
+  return x.toString().replace(/(\d)(?=(\d\d)+\d$)/g, "$1,");
+}
+
+function findMatches(wordToMatch, dataArr){
+  return dataArr.filter(data =>{
+    return  data.city.includes(wordToMatch) || data.state.includes(wordToMatch);
+  })
+}
+
+function displayMatches(){
+  let dispData = findMatches(this.value,dataArr);
+  let html = dispData.map(data =>{
+    
+    let colCityName = data.city.replace(this.value,`<span class="hl">${this.value}</span>`);
+    let colStateName = data.state.replace(this.value,`<span class="hl">${this.value}</span>`);
+    return `
+    <li>
+    <span class="name">${colCityName},${colStateName}</span>
+    <span class="population">${numberWithCommas(data.population)}</span>
+    </li>
+    `;
+  }).join('');
+  if(this.value === '' || dispData.length==0)
+    {
+      html = `<li>
+    No Results Found</li>`;
+      }
+  sugg.innerHTML = html;
+}
+const search = document.querySelector('.search');
+const sugg = document.querySelector('.suggestions');
+search.addEventListener("keyup",displayMatches);
 
 </script>
 </body>
